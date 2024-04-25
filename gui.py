@@ -1,5 +1,7 @@
 import tkinter as tk
 import osc_cilent
+import yamaha
+import MA3
 
 def QL1():
     receive_ip = "192.168.254.184"

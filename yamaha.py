@@ -1,16 +1,9 @@
-# This python file works with the Raspberry Pi
-# Please ensure that this python script is in the same directory as command.py and recall.py
-# Huats 2023 oscstarterkit
-# Please refer to Yamnaha's command_list.pdf to get the full list of control
-# There are two functions in this python script, namely, run_command and run_recall (specifically to recall scene)
-# A valid input argument for run_command would be 'set MIXER:Current/InCh/Fader/Level 0 0 1000' - this will execute the command for the console adjust channel 1's fader to +10dB
-# A valid input argument for run_recall would be '8' - this will execute the command for the console to recall scene 8
-
 import subprocess
 import time 
+import pythonosc
 
 def run_command(command):
-    text = 'python3 command.py '
+    text = 'python3 command.py'
     config = text + command
     print(config)
     try:
@@ -29,16 +22,32 @@ def run_recall(command):
     except subprocess.CalledProcessError as e:
         print(f"Error: {e.returncode}, {e.output.decode('utf-8')}")
     
+def fader(IP, PORT, x, y):
+    if 0 <= x <= 31 and 0 <= y <= 100:
+        command = f"set MIXER:Current/InCh/Fader/Level {str(x)} 0 {str(y)}"
+        run_command(command)
+    else:
+        print("Invalid x or y value for fader function.")
+def mute(IP, PORT, x, y=0):  # y is optional and set to 0 as default
+    if 0 <= x <= 31:
+        command = f"set MIXER:Current/InCh/Fader/Off {str(x)} 0"
+        run_command(command)
+    else:
+        print("Invalid x value for mute function.")
 
+def Unmute(IP, PORT, x, y=1):  # y is optional and set to 0 as default
+    if 0 <= x <= 31:
+        command = f"set MIXER:Current/InCh/Fader/On {str(x)} 1"
+        run_command(command)
+    else:
+        print("Invalid x value for Unmute function.")
+def Pan(IP, PORT, x, y):
+    if 0 <= x <= 31 and --63 <= y <= 63:
+        command = f"set MIXER:Current/InCh/Fader/Pan {str(x)} 0 {str(y)}"
+        run_command(command)
+    else:
+        print("Invalid x or y value for Pan function.")
 
 if __name__ == "__main__":
-    # Demo (To adjust channel 1, 2, 3 faders' to +10dB)
-    command = 'set MIXER:Current/InCh/Fader/Level 0 0 1000'
-    run_command(command)
-    time.sleep(1)
-    command = 'set MIXER:Current/InCh/Fader/Level 1 0 1000'
-    run_command(command)
-    time.sleep(1)
-    command = 'set MIXER:Current/InCh/Fader/Level 2 0 1000'
-    run_command(command)
-    time.sleep(1)
+    IP = "192.168.254.197"  # Listen on all available network interfaces
+    PORT = 1234  # Choose a port number
